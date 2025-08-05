@@ -8,7 +8,7 @@ import numpy as np
 
 # Moduli Progetto
 from scraper import load_estrazioni_from_url
-from modello import vicino_digitale  
+from modello import applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale  
 from modello import (
     RUOTE, funzione_peso, somma_fasi_posizionali,
     genera_tabellone, genera_tabellone_softmax,
@@ -63,6 +63,21 @@ def main():
     T = len(range_attivo) - 1
     peso_fn = funzione_peso(k, T)
     somma_dec, somma_uni = somma_fasi_posizionali(range_attivo, peso_fn, verbose=verbose)
+
+    # Applichiamo una o più rotazioni Grover su tutte le posizioni
+    num_iter_grover = int(config['Modello'].get('iterazioni_di_grover', 0))
+    if num_iter_grover > 0:
+        somma_dec, somma_uni = applica_rotazione_grover_tabellone(somma_dec, somma_uni, iterazioni=num_iter_grover)
+
+    # Applichiamo l'oracolo se abilitato
+    usa_oracolo = config['Modello'].getboolean('usa_grover_oracolo', fallback=False)
+    if usa_oracolo:
+        somma_dec, somma_uni = inversione_segno_oracolo(somma_dec, somma_uni)
+
+    # Applichiamo la riflessione d'equilibrio se abilitata
+    usa_riflessione_equilibrio = config['Modello'].getboolean('usa_riflessione_equilibrio', fallback=False)
+    if usa_riflessione_equilibrio:
+        somma_dec, somma_uni = riflessione_equilibrio_tabellone(somma_dec, somma_uni)
 
     if verbose:
         print(f"\nEstrazioni caricate: shape {estrazioni.shape}")

@@ -167,3 +167,109 @@ def genera_tabellone_softmax_decoerente(sum_dec, sum_uni, beta, shift_medio=0.0,
             u = np.random.choice(10, p=p_uni)
             tabellone[i, j] = 10 * d + u
     return tabellone
+def riflessione(v, asse):
+    """Riflessione del vettore v rispetto a un asse (entrambi normalizzati)."""
+    asse = asse / np.linalg.norm(asse)
+    proiezione = np.vdot(asse, v) * asse
+    return 2 * proiezione - v
+
+def rotazione_grover(v, target, equilibrio):
+    """
+    Una singola rotazione Grover-style: riflessione su target, poi su equilibrio.
+    Tutti i vettori sono normalizzati.
+    """
+    target = target / np.linalg.norm(target)
+    equilibrio = equilibrio / np.linalg.norm(equilibrio)
+    v1 = riflessione(v, target)
+    return riflessione(v1, equilibrio)
+
+def applica_rotazione_grover_tabellone(sum_dec, sum_uni, iterazioni=1):
+    """
+    Applica rotazioni Grover-style su tutto il tabellone di fasi:
+    - sum_dec e sum_uni sono matrici (11x5) di vettori complessi
+    - per ogni posizione (i,j) si applicano rotazioni Grover su decine e unità
+    """
+    nuovo_sum_dec = np.copy(sum_dec)
+    nuovo_sum_uni = np.copy(sum_uni)
+
+    # Vettore equilibrio: media delle 10 direzioni di fase (uniforme)
+    equilibrio = np.mean([np.exp(1j * angolo_fase(c)) for c in range(10)])
+
+    for i in range(11):
+        for j in range(5):
+            v_d = nuovo_sum_dec[i, j]
+            v_u = nuovo_sum_uni[i, j]
+
+            for _ in range(iterazioni):
+                # Target: direzione più vicina tra le 10 cifre (modulo coseno²)
+                fase_d = np.angle(v_d)
+                fase_u = np.angle(v_u)
+
+                probs_d = [np.cos(fase_d - angolo_fase(c))**2 for c in range(10)]
+                probs_u = [np.cos(fase_u - angolo_fase(c))**2 for c in range(10)]
+
+                target_digit_d = np.argmax(probs_d)
+                target_digit_u = np.argmax(probs_u)
+
+                target_d = np.exp(1j * angolo_fase(target_digit_d))
+                target_u = np.exp(1j * angolo_fase(target_digit_u))
+
+                v_d = rotazione_grover(v_d, target_d, equilibrio)
+                v_u = rotazione_grover(v_u, target_u, equilibrio)
+
+            nuovo_sum_dec[i, j] = v_d
+            nuovo_sum_uni[i, j] = v_u
+
+    return nuovo_sum_dec, nuovo_sum_uni
+
+def inversione_segno_oracolo(sum_dec, sum_uni):
+    """
+    Simula l'oracolo Groveriano:
+    per ogni posizione (i,j), inverte il segno del vettore complesso
+    se la sua fase è vicina a quella della cifra target.
+    """
+    nuovo_sum_dec = np.copy(sum_dec)
+    nuovo_sum_uni = np.copy(sum_uni)
+
+    for i in range(11):
+        for j in range(5):
+            # === Decine ===
+            ang_dec = np.angle(sum_dec[i, j])
+            target_dec = np.argmax([np.cos(ang_dec - angolo_fase(c))**2 for c in range(10)])
+            fase_target_dec = angolo_fase(target_dec)
+
+            # Se il vettore è allineato alla fase target → inversione
+            if abs(np.angle(sum_dec[i, j]) - fase_target_dec) < np.pi / 10:
+                nuovo_sum_dec[i, j] *= -1  # cambio di segno
+
+            # === Unitá ===
+            ang_uni = np.angle(sum_uni[i, j])
+            target_uni = np.argmax([np.cos(ang_uni - angolo_fase(c))**2 for c in range(10)])
+            fase_target_uni = angolo_fase(target_uni)
+
+            if abs(np.angle(sum_uni[i, j]) - fase_target_uni) < np.pi / 10:
+                nuovo_sum_uni[i, j] *= -1
+
+    return nuovo_sum_dec, nuovo_sum_uni
+
+def riflessione_equilibrio_tabellone(sum_dec, sum_uni):
+    """
+    Riflette ogni vettore di fase rispetto al vettore di equilibrio uniforme.
+    Equivale al secondo step dell'algoritmo di Grover.
+    """
+    nuovo_sum_dec = np.copy(sum_dec)
+    nuovo_sum_uni = np.copy(sum_uni)
+
+    # Vettore equilibrio: media uniforme delle 10 fasi
+    equilibrio = np.mean([np.exp(1j * angolo_fase(c)) for c in range(10)])
+    equilibrio = equilibrio / np.abs(equilibrio)  # normalizzato
+
+    for i in range(11):
+        for j in range(5):
+            v_d = nuovo_sum_dec[i, j]
+            v_u = nuovo_sum_uni[i, j]
+
+            nuovo_sum_dec[i, j] = riflessione(v_d, equilibrio)
+            nuovo_sum_uni[i, j] = riflessione(v_u, equilibrio)
+
+    return nuovo_sum_dec, nuovo_sum_uni

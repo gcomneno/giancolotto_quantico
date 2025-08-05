@@ -54,22 +54,24 @@ echo ""
 # === Esecuzione con log ===
 bash "$ACTION_SCRIPT" 2>&1 | tee "$OUTPUT_PATH"
 
-# === Esiti Totali ===
-echo "--------------------------"
-match_esatti=$(grep -Eo 'MATCH: [0-9]+' "./$OUTPUT_PATH" | awk -F'[/ ]+' '{sum += $2} END {print sum}')
-match_vicini=$(grep -Eo 'VICINI: [0-9]+' "./$OUTPUT_PATH" | awk -F'[/ ]+' '{sum += $2} END {print sum}')
+if [[ "$ACTION" != "taratura_k_softmax" ]]; then
+    # === Esiti Totali ===
+    echo "--------------------------"
+    match_esatti=$(grep -Eo 'MATCH: [0-9]+' "./$OUTPUT_PATH" | awk -F'[/ ]+' '{sum += $2} END {print sum}')
+    match_vicini=$(grep -Eo 'VICINI: [0-9]+' "./$OUTPUT_PATH" | awk -F'[/ ]+' '{sum += $2} END {print sum}')
 
-if [[ -n "$match_esatti" ]]; then
-    echo "✔️  Match esatti: $match_esatti"
-else
-    echo "❌ Match esatti NON trovati nel report."
+    if [[ -n "$match_esatti" ]]; then
+        echo "✔️  Match esatti: $match_esatti"
+    else
+        echo "❌ Match esatti NON trovati nel report."
+    fi
+
+    if [[ -n "$match_vicini" ]]; then
+        echo "✔️  Match vicini: $match_vicini"
+    else
+        echo "❌ Match vicini NON trovati nel report."
+    fi
+
+    # === Conferma finale ===
+    echo -e "\n✅ Output salvato in: $OUTPUT_PATH"
 fi
-
-if [[ -n "$match_vicini" ]]; then
-    echo "✔️  Match vicini: $match_vicini"
-else
-    echo "❌ Match vicini NON trovati nel report."
-fi
-
-# === Conferma finale ===
-echo -e "\n✅ Output salvato in: $OUTPUT_PATH"

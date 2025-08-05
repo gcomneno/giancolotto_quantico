@@ -1,0 +1,66 @@
+[Scraping]
+# URL della pagina da cui vengono scaricate le estrazioni ufficiali
+url=https://www.estrazionedellotto.it/risultati/archivio-lotto-2025
+
+# Indice dell’ultima estrazione da considerare per la predizione
+ultima_estrazione_da_considerare=124
+
+[Modello]
+# Intervallo iniziale rispetto all'estrazione di riferimento
+range_attivo_offset=6
+
+# Numero di estrazioni da considerare nel range attivo
+range_attivo_len=28
+
+# Fattore di decadimento temporale: più alto = meno peso al passato remoto
+decadimento_k=0.57
+
+# Attiva il meccanismo probabilistico di selezione cifre con funzione SoftMax
+usa_softmax=True
+
+# Parametro β (beta) della SoftMax: regola la "temperatura" del sistema
+# Valori alti → scelta più netta verso i massimi (comportamento deterministico)
+# Valori bassi → distribuzione più ampia (comportamento probabilistico)
+# Consigliato: 14.40 per buon compromesso tra selettività e diversità
+softmax_beta=14.40
+
+# Attiva la media mobile sulle predizioni per aumentare la stabilità del modello
+media_mobile_attiva=True
+
+# Numero di predizioni da eseguire per poi calcolare la media mobile (minimo=1)
+media_mobile_num_predizioni=100
+
+# Numero di iterazioni quantistiche in stile Grover da applicare al vettore predittivo.
+# Ogni iterazione ruota il vettore di fase di ciascuna cifra verso la sua configurazione più coerente (fase target),
+# amplificando le probabilità tramite interferenza costruttiva.
+# Valori consigliati:
+# - 0 → disabilitato (default storico del sistema)
+# - 1 → rotazione lieve, suggerita come nuovo default
+# - 2–3 → rotazione più marcata, utile in sistemi più "rumorosi"
+iterazioni_di_grover=2
+
+# Abilita l'oracolo Grover: inverte il segno della componente
+# associata alla cifra target (più coerente) per ogni posizione.
+# Deve essere usato prima della riflessione Grover.
+usa_grover_oracolo=True
+
+# Applica la riflessione del vettore predittivo rispetto allo stato uniforme (Grover)
+# Viene usata dopo "l'oracolo" ed equivale a completare il ciclo Grover: Oracle + Riflesso
+usa_riflessione_equilibrio=False
+
+# Intensità del rumore di fase (in radianti): simula la decoerenza quantistica
+# Valori più alti aumentano la casualità del sistema → predizioni più caotiche
+# Range utile: 0.1 (debole) a 0.6 (forte). Default stabile: 0.2
+rumore_fase=0.0
+
+# Entità della variazione dinamica del parametro beta in presenza di decoerenza
+# Aumenta o riduce β in risposta al "rumore" del sistema
+# Valori tipici: 0.3 (soft), 0.5 (moderato), 1.0 (aggressivo)
+variazione_beta=0.0
+
+[Output]
+# Soglia di "vicinanza" per considerare un numero quasi azzeccato
+soglia_vicini=1
+
+# Peso da assegnare ad ogni "vicino" nel computo dello SCORE predittivo
+peso_vicini=0.25
