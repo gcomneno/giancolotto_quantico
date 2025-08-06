@@ -2,18 +2,22 @@
 import sys
 import configparser
 from collections import Counter
+import json
+import os
+from glob import glob
 
 # Librerie Third-party
 import numpy as np
 
 # Moduli Progetto
 from scraper import load_estrazioni_from_url
-from modello import applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale  
+from modello import POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale  
 from modello import (
     RUOTE, funzione_peso, somma_fasi_posizionali,
     genera_tabellone, genera_tabellone_softmax,
     score, calcola_shift_medio_vicini,
-    genera_tabellone_softmax_decoerente
+    genera_tabellone_softmax_decoerente,
+    aggiorna_parametri_con_feedback
 )
 
 def main():
@@ -36,6 +40,7 @@ def main():
     beta = float(config['Modello'].get('softmax_beta', fallback=1.0))
     rumore_fase = float(config['Modello'].get('rumore_fase', '0.0'))
     variazione_beta = float(config['Modello'].get('variazione_beta', '0.0'))
+    auto_adattamento = config['Modello'].getboolean('auto_adattamento', fallback=False)
 
     # Acquisizione Estrazioni
     estrazioni, _ = load_estrazioni_from_url('./etc/config.ini')
@@ -64,23 +69,17 @@ def main():
     peso_fn = funzione_peso(k, T)
     somma_dec, somma_uni = somma_fasi_posizionali(range_attivo, peso_fn, verbose=verbose)
 
-    # Applichiamo una o più rotazioni Grover su tutte le posizioni
     num_iter_grover = int(config['Modello'].get('iterazioni_di_grover', 0))
     if num_iter_grover > 0:
         somma_dec, somma_uni = applica_rotazione_grover_tabellone(somma_dec, somma_uni, iterazioni=num_iter_grover)
 
-    # Applichiamo l'oracolo se abilitato
     usa_oracolo = config['Modello'].getboolean('usa_grover_oracolo', fallback=False)
     if usa_oracolo:
         somma_dec, somma_uni = inversione_segno_oracolo(somma_dec, somma_uni)
 
-    # Applichiamo la riflessione d'equilibrio se abilitata
     usa_riflessione_equilibrio = config['Modello'].getboolean('usa_riflessione_equilibrio', fallback=False)
     if usa_riflessione_equilibrio:
         somma_dec, somma_uni = riflessione_equilibrio_tabellone(somma_dec, somma_uni)
-
-    if verbose:
-        print(f"\nEstrazioni caricate: shape {estrazioni.shape}")
 
     shift_medio = 0.0
     if usa_softmax and media_mobile:
@@ -112,7 +111,8 @@ def main():
     else:
         predetto = genera_tabellone(somma_dec, somma_uni, shift_medio)
 
-    # Stampa tabellone predetto
+    print(f"\nTABELLONE PREDETTO SULLA (n. {reale_idx + 1})")
+    print("---------- ---------------------")
     for i in range(11):
         riga = []
         for j in range(5):
@@ -127,7 +127,6 @@ def main():
             riga.append(f"{numero:02d}{simbolo}")
         print(f"{RUOTE[i]:<10} " + "  ".join(riga))
 
-    # Stampa tabellone reale
     if reale is not None:
         print(f"\nCONFRONTO CON L'ESTRAZIONE REALE (n. {reale_idx + 1})")
         print("---------- ---------------------")
@@ -142,6 +141,25 @@ def main():
             print(f"\nshift_medio: {shift_medio:.3f} fase_corr +- {fase_shift:.3f} rad")
 
         print(f"\n### SCORE: {score_tot:.1f} | MATCH: {match} | VICINI: {vicini}")
+
+        # Feedback loop se abilitato
+        if auto_adattamento:
+            aggiorna_parametri_con_feedback(score_tot)
+
+    # Logging JSON dei match
+    trigger_log = []
+    for i in range(11):
+        for j in range(5):
+            numero_predetto = int(predetto[i, j])
+            numero_reale = int(reale[i, j])
+            match = numero_predetto == numero_reale
+            trigger_log.append({
+                "ruota": RUOTE[i],
+                "posizione": POSIZIONI[j],
+                "predetto": numero_predetto,
+                "reale": numero_reale,
+                "match": match
+            })
 
 if __name__ == "__main__":
     main()

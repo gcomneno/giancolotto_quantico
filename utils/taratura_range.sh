@@ -10,9 +10,9 @@ CONFIG_FILE="$ROOT_DIR/etc/config.ini"
 MAIN_SCRIPT="$ROOT_DIR/src/main.py"
 
 # Parametri di riferimento
-K_OPT=0.57
-RANGE_OFFSET=5
-RANGE_LEN=3
+K_OPT=0.40
+RANGE_OFFSET=0
+RANGE_LEN=5
 ULTIMA_ESTRAZIONE=100
 
 # Colori
@@ -60,3 +60,4 @@ echo "${YELLOW}✅ Taratura range completata.${RESET}"
 echo ""
 
 echo "🕒 Fine:  $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""

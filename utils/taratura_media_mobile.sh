@@ -11,7 +11,7 @@ MAIN_SCRIPT="$ROOT_DIR/src/main.py"
 
 # Parametri
 START=90
-END=99999
+END=130
 STEP=1
 
 # Colori
@@ -48,3 +48,4 @@ echo ""
 echo "${CYAN}✅ Taratura completata.${RESET}"
 echo ""
 echo "🕒 Fine:  $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""

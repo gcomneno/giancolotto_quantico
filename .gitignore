@@ -38,3 +38,6 @@ logs/
 
 # Reports
 reports/
+
+etc/config.ini.bak
+etc/config.ini
