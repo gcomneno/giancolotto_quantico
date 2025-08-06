@@ -211,7 +211,7 @@ def aggiorna_parametri_con_feedback(score_corrente, score_precedente_path="logs/
             pass
 
     if score_precedente is not None and score_corrente <= score_precedente:
-        print(f"[ADATTAMENTO] Nessun aggiornamento: performance accettabile")
+        print(f"\n[ADATTAMENTO] Nessun aggiornamento dinamico alla configurazione")
         return
 
     config = configparser.ConfigParser()
@@ -239,7 +239,7 @@ def aggiorna_parametri_con_feedback(score_corrente, score_precedente_path="logs/
     with open(config_path, "w") as f:
         config.write(f, space_around_delimiters=False)
 
-    print(f"[ADATTAMENTO] Nuovi parametri: {{'k': {k:.4f}, 'beta': {beta:.4f}, 'shift_medio': {shift:.4f}}}")
+    print(f"\n[ADATTAMENTO] Nuovi parametri: {{'k': {k:.4f}, 'beta': {beta:.4f}, 'shift_medio': {shift:.4f}}}")
     print("[CONFIG] Parametri aggiornati nel file .ini")
 
     np.save(score_precedente_path, score_corrente)

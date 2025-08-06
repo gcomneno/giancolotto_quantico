@@ -131,7 +131,7 @@ def main():
         print(f"\nCONFRONTO CON L'ESTRAZIONE REALE (n. {reale_idx + 1})")
         print("---------- ---------------------")
         for i in range(11):
-            riga = "  ".join(f"{reale[i, j]:02d}" for j in range(5))
+            riga = "   ".join(f"{reale[i, j]:02d}" for j in range(5))
             print(f"{RUOTE[i]:<10} {riga}")
 
         score_tot, match, vicini = score(predetto, reale, peso_vicini, soglia)
