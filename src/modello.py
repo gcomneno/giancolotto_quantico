@@ -272,3 +272,44 @@ def aggiorna_parametri_con_feedback(score_corrente, score_precedente_path="logs/
 
     np.save(score_precedente_path, score_corrente)
     print("[INFO] Score precedente salvato in logs/score_storico.npy")
+
+def stampa_vicini_digitali(predetto, reale, numero_estrazione):
+    """
+    Mostra per ogni ruota la cinquina predetta seguita dai suoi vicini digitali (+/-1 ... +/-5),
+    con segnalazione "@" se il numero è stato estratto realmente su quella ruota.
+    Il calcolo dei vicini avviene sulle singole cifre (decine e unità) in modo circolare.
+    """
+    print(f"\nESTRAPOLAZIONE DEI VICINI DIGITALI (n. {numero_estrazione})")
+    print("-" * 60)
+
+    for i, ruota in enumerate(RUOTE):
+        pred_cinquina = predetto[i]
+        numeri_reali = set(reale[i])
+
+        # Riga con i numeri predetti
+        riga = f"{ruota:<9}"
+        for num in pred_cinquina:
+            simbolo = "@" if num in numeri_reali else " "
+            riga += f"{num:02d}{simbolo:<8}"
+        print('\n' + riga)
+
+        # Righe dei vicini digitali (shift su cifre decina/unità)
+        for o in range(1, 6):
+            riga_vicini = f"+o-{o}:    "
+            for num in pred_cinquina:
+                dec, uni = divmod(num, 10)
+                sx = ((dec + o) % 10) * 10 + uni
+                dx = ((dec - o) % 10) * 10 + uni
+
+                # Se convergono, mostro solo uno dei due ma con spazi per allineamento
+                if sx == dx:
+                    simbolo = "@" if sx in numeri_reali else " "
+                    riga_vicini += f"{sx:02d}{simbolo:<7}"  # stesso spazio di XX|YY
+                else:
+                    simbolo_sx = "@" if sx in numeri_reali else " "
+                    simbolo_dx = "@" if dx in numeri_reali else " "
+                    coppia = f"{sx:02d}{simbolo_sx}|{dx:02d}{simbolo_dx}"
+                    riga_vicini += f"{coppia:<9}"
+
+            print(riga_vicini)
+        print()

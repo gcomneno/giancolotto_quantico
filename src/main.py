@@ -8,7 +8,7 @@ import numpy as np
 
 # Moduli Progetto
 from scraper import load_estrazioni_from_url
-from modello import calcola_combinazioni_vinte, POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale  
+from modello import calcola_combinazioni_vinte, POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale, stampa_vicini_digitali
 from modello import (
     RUOTE, funzione_peso, somma_fasi_posizionali,
     genera_tabellone, genera_tabellone_softmax,
@@ -108,7 +108,7 @@ def main():
     else:
         predetto = genera_tabellone(somma_dec, somma_uni, shift_medio)
 
-    print(f"\nTABELLONE PREDETTO SULLA (n. {reale_idx + 1})")
+    print(f"\nTABELLONE PREDETTO (n. {reale_idx + 1})")
     print("---------- ---------------------")
     for i in range(11):
         riga = []
@@ -123,6 +123,8 @@ def main():
                     simbolo = "*"
             riga.append(f"{numero:02d}{simbolo}")
         print(f"{RUOTE[i]:<10} " + "  ".join(riga))
+
+    stampa_vicini_digitali(predetto, reale, reale_idx + 1)
 
     if reale is not None:
         print(f"\nCONFRONTO CON L'ESTRAZIONE REALE (n. {reale_idx + 1})")
