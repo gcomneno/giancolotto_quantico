@@ -276,40 +276,40 @@ def aggiorna_parametri_con_feedback(score_corrente, score_precedente_path="logs/
 def stampa_vicini_digitali(predetto, reale, numero_estrazione):
     """
     Mostra per ogni ruota la cinquina predetta seguita dai suoi vicini digitali (+/-1 ... +/-5),
-    con segnalazione "@" se il numero è stato estratto realmente su quella ruota.
-    Il calcolo dei vicini avviene sulle singole cifre (decine e unità) in modo circolare.
+    con evidenza "@" solo se l'estrazione reale è disponibile.
+    Il calcolo dei vicini avviene sulle cifre (decine e unità), in modo circolare.
     """
     print(f"\nESTRAPOLAZIONE DEI VICINI DIGITALI (n. {numero_estrazione})")
     print("-" * 60)
 
     for i, ruota in enumerate(RUOTE):
         pred_cinquina = predetto[i]
-        numeri_reali = set(reale[i])
+        numeri_reali = set(reale[i]) if reale is not None and reale[i] is not None else set()
 
-        # Riga con i numeri predetti
-        riga = f"{ruota:<9}"
+        # Stampa della cinquina predetta (con @ solo se reale è disponibile)
+        riga = f"{ruota:<10}"
         for num in pred_cinquina:
             simbolo = "@" if num in numeri_reali else " "
             riga += f"{num:02d}{simbolo:<8}"
-        print('\n' + riga)
+        print(riga)
 
-        # Righe dei vicini digitali (shift su cifre decina/unità)
-        for o in range(1, 6):
-            riga_vicini = f"+o-{o}:    "
+        # Calcolo vicini digitali circolari cifrari
+        for offset in range(1, 6):
+            riga_vicini = f"+o-{offset}:    "
             for num in pred_cinquina:
-                dec, uni = divmod(num, 10)
-                sx = ((dec + o) % 10) * 10 + uni
-                dx = ((dec - o) % 10) * 10 + uni
+                d, u = divmod(num, 10)
 
-                # Se convergono, mostro solo uno dei due ma con spazi per allineamento
-                if sx == dx:
-                    simbolo = "@" if sx in numeri_reali else " "
-                    riga_vicini += f"{sx:02d}{simbolo:<7}"  # stesso spazio di XX|YY
+                vd = ((d + offset) % 10) * 10 + (u - offset) % 10
+                vs = ((d - offset) % 10) * 10 + (u + offset) % 10
+
+                if vd == vs:
+                    # Mostra solo una volta se i due coincidono
+                    simbolo = "@" if vd in numeri_reali else " "
+                    riga_vicini += f"{vd:02d}{simbolo:<9}"
+                    break  # nessun altro vicino per questa riga
                 else:
-                    simbolo_sx = "@" if sx in numeri_reali else " "
-                    simbolo_dx = "@" if dx in numeri_reali else " "
-                    coppia = f"{sx:02d}{simbolo_sx}|{dx:02d}{simbolo_dx}"
-                    riga_vicini += f"{coppia:<9}"
-
+                    simbolo_vd = "@" if vd in numeri_reali else " "
+                    simbolo_vs = "@" if vs in numeri_reali else " "
+                    riga_vicini += f"{vd:02d}{simbolo_vd}|{vs:02d}{simbolo_vs}   "
             print(riga_vicini)
         print()

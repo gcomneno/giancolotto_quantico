@@ -11,7 +11,7 @@ RUN_SCRIPT="$SCRIPT_DIR/run.sh"
 
 # Range estrazioni
 START=10
-STOP=100
+STOP=124
 TOTAL=$((STOP - START + 1))
 CURRENT=0
 
