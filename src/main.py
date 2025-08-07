@@ -2,16 +2,13 @@
 import sys
 import configparser
 from collections import Counter
-import json
-import os
-from glob import glob
 
 # Librerie Third-party
 import numpy as np
 
 # Moduli Progetto
 from scraper import load_estrazioni_from_url
-from modello import POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale  
+from modello import calcola_combinazioni_vinte, POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale  
 from modello import (
     RUOTE, funzione_peso, somma_fasi_posizionali,
     genera_tabellone, genera_tabellone_softmax,
@@ -142,24 +139,16 @@ def main():
 
         print(f"\n### SCORE: {score_tot:.1f} | MATCH: {match} | VICINI: {vicini}")
 
+        combinazioni = calcola_combinazioni_vinte(predetto, reale, RUOTE)
+
+        print("\n== COMBINAZIONI INDETERMINATE PER RUOTA ==")
+        for ruota in RUOTE:
+            c = combinazioni[ruota]
+            print(f"{ruota:<10} -> {c['estratti']}E {c['ambi']}A {c['terni']}T {c['quaterne']}Q {c['cinquine']}C | {c['numeri_comuni']}")
+
         # Feedback loop se abilitato
         if auto_adattamento:
             aggiorna_parametri_con_feedback(score_tot)
-
-    # Logging JSON dei match
-    trigger_log = []
-    for i in range(11):
-        for j in range(5):
-            numero_predetto = int(predetto[i, j])
-            numero_reale = int(reale[i, j])
-            match = numero_predetto == numero_reale
-            trigger_log.append({
-                "ruota": RUOTE[i],
-                "posizione": POSIZIONI[j],
-                "predetto": numero_predetto,
-                "reale": numero_reale,
-                "match": match
-            })
 
 if __name__ == "__main__":
     main()

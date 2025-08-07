@@ -25,6 +25,34 @@ RUMORE_FASE = float(_config["Modello"].get("rumore_fase", 0.0))
 VARIAZIONE_BETA = float(_config["Modello"].get("variazione_beta", 0.0))
 
 # === Utility ===
+def calcola_combinazioni_vinte(predetto, reale, ruote):
+    """
+    Calcola per ciascuna ruota il numero di estratti, ambi, terni, quaterne, cinquine
+    confrontando i numeri predetti con quelli reali.
+    """
+    if reale is None:
+        print(f"Estrazione reale non disponibile nei dati.")
+        return
+
+    risultati = {}
+
+    for i, ruota in enumerate(ruote):
+        pred = set(predetto[i])
+        real = set(reale[i])
+        comuni = list(pred & real)
+        n = len(comuni)
+
+        risultati[ruota] = {
+            'estratti': n,
+            'ambi': 1 if n >= 2 else 0,
+            'terni': 1 if n >= 3 else 0,
+            'quaterne': 1 if n >= 4 else 0,
+            'cinquine': 1 if n == 5 else 0,
+            'numeri_comuni': "   ".join(f"{x:02d}" for x in sorted(comuni))
+        }
+
+    return risultati
+
 def distanza_circolare(a, b):
     a = np.asarray(a)
     b = np.asarray(b)
