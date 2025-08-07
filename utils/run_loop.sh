@@ -10,8 +10,8 @@ CONFIG_FILE="$ROOT_DIR/etc/config.ini"
 RUN_SCRIPT="$SCRIPT_DIR/run.sh"
 
 # Range estrazioni
-START=10
-STOP=124
+START=100
+STOP=125
 TOTAL=$((STOP - START + 1))
 CURRENT=0
 

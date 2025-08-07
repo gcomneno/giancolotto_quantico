@@ -306,7 +306,6 @@ def stampa_vicini_digitali(predetto, reale, numero_estrazione):
                     # Mostra solo una volta se i due coincidono
                     simbolo = "@" if vd in numeri_reali else " "
                     riga_vicini += f"{vd:02d}{simbolo:<9}"
-                    break  # nessun altro vicino per questa riga
                 else:
                     simbolo_vd = "@" if vd in numeri_reali else " "
                     simbolo_vs = "@" if vs in numeri_reali else " "
