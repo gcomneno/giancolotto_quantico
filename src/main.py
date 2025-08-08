@@ -8,7 +8,7 @@ import numpy as np
 
 # Moduli Progetto
 from scraper import load_estrazioni_from_url
-from modello import calcola_combinazioni_vinte, POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, vicino_digitale, stampa_vicini_digitali
+from modello import calcola_combinazioni_vinte, POSIZIONI, applica_rotazione_grover_tabellone, inversione_segno_oracolo, riflessione_equilibrio_tabellone, stampa_vicini_digitali, vicino_digitale
 from modello import (
     RUOTE, funzione_peso, somma_fasi_posizionali,
     genera_tabellone, genera_tabellone_softmax,

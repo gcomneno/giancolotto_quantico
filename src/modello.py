@@ -283,20 +283,28 @@ def stampa_vicini_digitali(predetto, reale, numero_estrazione):
     print("-" * 60)
 
     for i, ruota in enumerate(RUOTE):
+        simboli_totali = [0] * 6  # indice 0 non usato
+
         pred_cinquina = predetto[i]
         numeri_reali = set(reale[i]) if reale is not None and reale[i] is not None else set()
 
         # Stampa della cinquina predetta (con @ solo se reale è disponibile)
         riga = f"{ruota:<10}"
+        tot_pos = 0
         for num in pred_cinquina:
+            tot_pos = tot_pos + 1
             simbolo = "@" if num in numeri_reali else " "
             riga += f"{num:02d}{simbolo:<8}"
+            if simbolo == "@":
+                simboli_totali[tot_pos] += 1
+
         print(riga)
 
-        # Calcolo vicini digitali circolari cifrari
         for offset in range(1, 6):
             riga_vicini = f"+o-{offset}:    "
+            tot_pos = 0
             for num in pred_cinquina:
+                tot_pos = tot_pos + 1
                 d, u = divmod(num, 10)
 
                 vd = ((d + offset) % 10) * 10 + (u - offset) % 10
@@ -306,9 +314,20 @@ def stampa_vicini_digitali(predetto, reale, numero_estrazione):
                     # Mostra solo una volta se i due coincidono
                     simbolo = "@" if vd in numeri_reali else " "
                     riga_vicini += f"{vd:02d}{simbolo:<9}"
+                    if simbolo == "@":
+                        simboli_totali[tot_pos] += 1
                 else:
                     simbolo_vd = "@" if vd in numeri_reali else " "
                     simbolo_vs = "@" if vs in numeri_reali else " "
                     riga_vicini += f"{vd:02d}{simbolo_vd}|{vs:02d}{simbolo_vs}   "
+
+                    simboli_totali[tot_pos] += (simbolo_vd == "@") + (simbolo_vs == "@")
+
             print(riga_vicini)
+
+        totali_str = "".join(f"{x:^{9}}" for x in simboli_totali[1:])
+        print(f"### TOT.:{totali_str}\t\t[{numero_estrazione}]")
+
         print()
+
+    return simboli_totali
