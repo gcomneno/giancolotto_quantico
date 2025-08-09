@@ -122,7 +122,7 @@ def main():
                 elif vicino_digitale(numero, r, soglia):
                     simbolo = "*"
             riga.append(f"{numero:02d}{simbolo}")
-        print(f"{RUOTE[i]:<10} " + "  ".join(riga))
+        print(f"@{RUOTE[i]:<10} " + "  ".join(riga))
 
     stampa_vicini_digitali(predetto, reale, reale_idx + 1)
 
@@ -146,7 +146,7 @@ def main():
         print("\n== COMBINAZIONI INDETERMINATE PER RUOTA ==")
         for ruota in RUOTE:
             c = combinazioni[ruota]
-            print(f"{ruota:<10} -> {c['estratti']}E {c['ambi']}A {c['terni']}T {c['quaterne']}Q {c['cinquine']}C | {c['numeri_comuni']}")
+            print(f"-> {ruota:<10} -> {c['estratti']}E {c['ambi']}A {c['terni']}T {c['quaterne']}Q {c['cinquine']}C | {c['numeri_comuni']}")
 
         # Feedback loop se abilitato
         if auto_adattamento:

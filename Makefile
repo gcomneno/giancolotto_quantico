@@ -1,11 +1,12 @@
 # === Makefile per GianKoLotto Quantico® ===
 
 # Comandi supportati
-.PHONY: run loop k beta media range tuning all help
+.PHONY: run loop k beta media range tuning all help verifica
 
 # Percorsi
 CONFIG_FILE := etc/config.ini
 LOG_RUNNER := utils/log_and_run.sh
+VERIFICA_SCRIPT := ./utils/verifica.sh
 
 # === Comandi principali ===
 
@@ -30,6 +31,10 @@ range:
 tuning:
 	@bash $(LOG_RUNNER) $(CONFIG_FILE) taratura_k_softmax
 
+# Nuovo comando per eseguire la verifica con due numeri
+verifica:
+	@bash $(VERIFICA_SCRIPT) $(num1) $(num2)
+
 all:
 	@echo "🌀 Inizio taratura completa GianKoLotto Quantico®..."
 	@start=$$(date +%s); \
@@ -51,3 +56,4 @@ help:
 	@echo "  make range     → Taratura intervallo estrazioni"
 	@echo "  make tuning    → Ricerca combinata k + SoftMax"
 	@echo "  make all       → Esegue tutte le tarature principali"
+	@echo "  make verifica  → Esegue verifica con due numeri (es: make verifica num1=46 num2=82)"

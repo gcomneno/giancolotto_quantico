@@ -289,7 +289,7 @@ def stampa_vicini_digitali(predetto, reale, numero_estrazione):
         numeri_reali = set(reale[i]) if reale is not None and reale[i] is not None else set()
 
         # Stampa della cinquina predetta (con @ solo se reale è disponibile)
-        riga = f"{ruota:<10}"
+        riga = f"[{ruota:<9}]"
         tot_pos = 0
         for num in pred_cinquina:
             tot_pos = tot_pos + 1
